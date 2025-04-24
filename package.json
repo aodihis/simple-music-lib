@@ -1,10 +1,20 @@
 {
-  "name": "271-as1",
+  "name": "music-lib",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start:prod": "NODE_ENV=production node ./src/server.js",
+    "start:dev": "nodemon ./src/server.js",
+    "lint": "eslint ./src",
+    "migrate": "node-pg-migrate"
   },
-  "private": true
+  "private": true,
+  "dependencies": {
+    "@hapi/hapi": "^21.4.0",
+    "dotenv": "^16.5.0",
+    "joi": "^17.13.3",
+    "node-pg-migrate": "^7.9.1",
+    "pg": "^8.15.5"
+  }
 }
