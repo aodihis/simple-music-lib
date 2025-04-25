@@ -1,4 +1,4 @@
-class albumHandler  {
+class albumHandler {
 
     constructor(service, validator) {
         this._service = service;
@@ -20,7 +20,7 @@ class albumHandler  {
     }
 
     async getAlbumHandler(request, h) {
-        const album = await  this._service.getById(request.params.id);
+        const album = await this._service.getById(request.params.id);
         return {
             status: "success",
             data: {
@@ -32,7 +32,7 @@ class albumHandler  {
     async createAlbumHandler(request, h) {
         this._validator.validateAlbumPayload(request.payload);
         const {name, year} = request.payload;
-        const id = await this._service.create({name,year});
+        const id = await this._service.create({name, year});
         const res = h.response({
             status: 'success',
             message: 'Album created',
@@ -46,7 +46,7 @@ class albumHandler  {
 
     async updateAlbumHandler(request, h) {
         this._validator.validateAlbumPayload(request.payload);
-        const { id } = request.params;
+        const {id} = request.params;
 
         await this._service.update(id, request.payload);
         return h.response({
@@ -56,7 +56,7 @@ class albumHandler  {
     }
 
     async deleteAlbumHandler(request, h) {
-        const { id } = request.params;
+        const {id} = request.params;
         await this._service.remove(id);
         return h.response({
             status: "success",

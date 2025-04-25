@@ -1,4 +1,4 @@
-class SongHandler  {
+class SongHandler {
 
     constructor(service, validator) {
         this._service = service;
@@ -22,7 +22,7 @@ class SongHandler  {
     }
 
     async getSongHandler(request, h) {
-        const song = await  this._service.getById(request.params.id);
+        const song = await this._service.getById(request.params.id);
         return {
             status: "success",
             data: {
@@ -48,7 +48,7 @@ class SongHandler  {
 
     async updateSongHandler(request, h) {
         this._validator.validateSongPayload(request.payload);
-        const { id } = request.params;
+        const {id} = request.params;
 
         await this._service.update(id, request.payload);
         return h.response({
@@ -58,7 +58,7 @@ class SongHandler  {
     }
 
     async deleteSongHandler(request, h) {
-        const { id } = request.params;
+        const {id} = request.params;
         await this._service.remove(id);
         return h.response({
             status: "success",

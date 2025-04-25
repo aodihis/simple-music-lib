@@ -1,5 +1,5 @@
-const { Pool } = require('pg');
-const { nanoid } = require('nanoid');
+const {Pool} = require('pg');
+const {nanoid} = require('nanoid');
 const InvariantError = require('../exceptions/InvariantError');
 const NotFoundError = require('../exceptions/NotFoundError');
 const {mapSongDBToModel, mapSongsDBToModel} = require("../utils/mapper");
@@ -24,14 +24,12 @@ class SongService {
         return res.rows.map(mapSongDBToModel)[0];
     }
 
-    async create({ albumId, title, year, genre, performer, duration }) {
+    async create({albumId, title, year, genre, performer, duration}) {
         const id = nanoid(16);
         const createdAt = new Date().toISOString();
         const res = await this._pool.query(
-            `INSERT INTO songs (
-        id, album_id, title, year, genre, performer, duration, created_at, updated_at
-      ) VALUES ($1,$2,$3,$4,$5,$6,$7,$8,$9)
-      RETURNING *`,
+            `INSERT INTO songs (id, album_id, title, year, genre, performer, duration, created_at, updated_at)
+             VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9) RETURNING *`,
             [id, albumId, title, year, genre, performer, duration, createdAt, createdAt]
         );
 
@@ -42,20 +40,19 @@ class SongService {
         return res.rows[0].id;
     }
 
-    async update(id, { albumId, title, year, genre, performer, duration }) {
+    async update(id, {albumId, title, year, genre, performer, duration}) {
         const updatedAt = new Date().toISOString();
 
         const res = await this._pool.query(
-            `UPDATE songs SET
-                album_id = $1,
-                title = $2,
-                year = $3,
-                genre = $4,
-                performer = $5,
-                duration = $6,
-                updated_at = $7
-              WHERE id = $8
-              RETURNING *`,
+            `UPDATE songs
+             SET album_id   = $1,
+                 title      = $2,
+                 year       = $3,
+                 genre      = $4,
+                 performer  = $5,
+                 duration   = $6,
+                 updated_at = $7
+             WHERE id = $8 RETURNING *`,
             [albumId, title, year, genre, performer, duration, updatedAt, id]
         );
 
