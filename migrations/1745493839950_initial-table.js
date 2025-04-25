@@ -9,10 +9,9 @@ exports.shorthands = undefined;
  * @returns {Promise<void> | void}
  */
 exports.up = (pgm) => {
-    pgm.createExtension('uuid-ossp', { ifNotExists: true });
     pgm.createTable('albums', {
         id: {
-            type: 'uuid',
+            type: 'varchar(21)',
             primaryKey: true,
         },
         name: {
@@ -23,16 +22,26 @@ exports.up = (pgm) => {
             type: 'integer',
             notNull: true,
         },
+        created_at: {
+            type: 'timestamp',
+            notNull: true,
+            default: pgm.func('CURRENT_TIMESTAMP'),
+        },
+        updated_at: {
+            type: 'timestamp',
+            notNull: true,
+            default: pgm.func('CURRENT_TIMESTAMP'),
+        },
     });
 
     pgm.createTable('songs', {
         id: {
-            type: 'uuid',
+            type: 'varchar(21)',
             primaryKey: true,
         },
         album_id: {
-            type: 'integer',
-            notNull: true,
+            type: 'varchar(21)',
+            notNull: false,
             references: '"albums"',
             onDelete: 'cascade',
         },
@@ -55,6 +64,16 @@ exports.up = (pgm) => {
         duration: {
             type: 'integer', // Assuming seconds
             notNull: false,
+        },
+        created_at: {
+            type: 'timestamp',
+            notNull: true,
+            default: pgm.func('CURRENT_TIMESTAMP'),
+        },
+        updated_at: {
+            type: 'timestamp',
+            notNull: true,
+            default: pgm.func('CURRENT_TIMESTAMP'),
         },
     });
 };
