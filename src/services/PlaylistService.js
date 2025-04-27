@@ -1,6 +1,7 @@
 // playlistService.js
 const { nanoid } = require('nanoid');
 const InvariantError = require('../exceptions/InvariantError.js');
+const AuthenticationError = require('../exceptions/AuthenticationError.js');
 const {mapPlaylistDBToModel} = require("../utils/mapper");
 
 class PlaylistService {
@@ -105,6 +106,28 @@ class PlaylistService {
         }
 
         return result.rows[0].id;
+    }
+
+    async verifyPlaylistOwner(id, owner) {
+        const query = {
+            text: 'SELECT * FROM playlists WHERE id = $1',
+            values: [id],
+        }
+
+        const res = await this._pool.query(query);
+
+        if (!res.rows.length) {
+            throw new InvariantError('Failed to verify playlist. Id not found.');
+        }
+
+        if (res.rows[0].owner !== owner) {
+            throw new AuthenticationError('Failed to verify playlist. Id not found.');
+        }
+
+    }
+
+    async verifyPlaylistAccess(id, owner) {
+        await this.verifyPlaylistOwner(id, owner);
     }
 }
 
