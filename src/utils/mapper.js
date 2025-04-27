@@ -26,8 +26,28 @@ function mapSongDBToModel(row) {
     };
 }
 
+function mapPlaylistDBToModel(row) {
+    return {
+        id: row.id,
+        name: row.name,
+        username: row.username,
+    }
+}
+
+function mapPlaylistSongDBToModel(row) {
+    return {
+        id: row.id,
+        title: row.title,
+        performer: row.performer,
+    }
+}
+
+
 module.exports = {
     mapAlbumDBToModel,
     mapSongDBToModel,
-    mapSongsDBToModel
+    mapSongsDBToModel,
+    mapPlaylistDBToModel,
+    mapPlaylistSongDBToModel,
 };
+
