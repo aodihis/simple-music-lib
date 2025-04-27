@@ -1,7 +1,7 @@
 // userService.js
 const bcrypt = require('bcrypt');
-const { nanoid } = require('nanoid');
-const { Pool } = require('pg');
+const {nanoid} = require('nanoid');
+const {Pool} = require('pg');
 const InvariantError = require('../exceptions/InvariantError');
 const NotFoundError = require('../exceptions/NotFoundError');
 const AuthenticationError = require('../exceptions/AuthenticationError');
@@ -11,7 +11,7 @@ class UserService {
         this._pool = new Pool();
     }
 
-    async addUser({ username, password, fullname }) {
+    async addUser({username, password, fullname}) {
         const hashedPassword = await bcrypt.hash(password, 10);
         const id = nanoid(16);
         const query = {
@@ -45,7 +45,7 @@ class UserService {
             throw new AuthenticationError('Invalid credentials');
         }
 
-        const { id, password: hashedPassword } = result.rows[0];
+        const {id, password: hashedPassword} = result.rows[0];
         const match = await bcrypt.compare(password, hashedPassword);
 
         if (!match) {

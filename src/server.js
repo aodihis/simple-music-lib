@@ -1,11 +1,13 @@
 require('dotenv').config();
 
 const Hapi = require('@hapi/hapi');
+const Jwt = require('@hapi/jwt');
 
 const albums = require('./api/albums');
 const songs = require('./api/songs');
 const authentications = require('./api/authentications');
 const users = require('./api/users');
+const playlists = require('./api/playlists');
 
 
 const ClientError = require("./exceptions/ClientError");
@@ -22,7 +24,6 @@ const SongValidator = require("./validators/song");
 const AuthenticationValidator = require("./validators/authentication");
 const UserValidator = require("./validators/user");
 const PlaylistValidator = require("./validators/playlist");
-const PlaylistSongValidator = require("./validators/playlist_song");
 
 const init = async () => {
     const albumService = new AlbumService();
@@ -39,6 +40,28 @@ const init = async () => {
                 origin: ['*'],
             },
         },
+    });
+
+    await server.register([
+        {
+            plugin: Jwt,
+        },
+    ]);
+
+    server.auth.strategy('jwt', 'jwt', {
+        keys: process.env.ACCESS_TOKEN_KEY,
+        verify: {
+            aud: false,
+            iss: false,
+            sub: false,
+            maxAgeSec: process.env.ACCESS_TOKEN_AGE,
+        },
+        validate: (artifacts) => ({
+            isValid: true,
+            credentials: {
+                id: artifacts.decoded.payload.id,
+            },
+        }),
     });
 
     await server.register([
@@ -69,9 +92,16 @@ const init = async () => {
                 authenticationsService: authenticationService,
                 usersService: userService,
                 tokenManager: TokenManager,
-                validator: SongValidator,
+                validator: AuthenticationValidator,
             },
-        }
+        },
+        {
+            plugin: playlists,
+            options: {
+                service: playlistService,
+                validator: PlaylistValidator,
+            },
+        },
     ]);
 
     server.ext('onPreResponse', (request, h) => {
