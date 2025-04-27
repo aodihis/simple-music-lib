@@ -33,7 +33,7 @@ class UserService {
         }
     }
 
-    async verifyCredential({ username, password }) {
+    async verifyCredential(username, password) {
         const query = {
             text: 'SELECT id, password FROM users WHERE username = $1',
             values: [username],
