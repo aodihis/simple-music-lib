@@ -3,6 +3,7 @@ function mapAlbumDBToModel(row) {
         id: row.id,
         name: row.name,
         year: row.year,
+        coverUrl: row.cover,
     };
 }
 

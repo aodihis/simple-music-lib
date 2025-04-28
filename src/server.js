@@ -8,7 +8,7 @@ const songs = require('./api/songs');
 const authentications = require('./api/authentications');
 const users = require('./api/users');
 const playlists = require('./api/playlists');
-
+const exports_plugin = require('./api/exports');
 
 const ClientError = require("./exceptions/ClientError");
 const AlbumService = require("./services/AlbumService");
@@ -16,6 +16,7 @@ const SongService = require("./services/SongService");
 const UserService = require("./services/UserService");
 const AuthenticationService = require("./services/AuthenticationService");
 const PlaylistService = require("./services/PlaylistService");
+const ProducerService = require("./services/ProducerService");
 
 const TokenManager = require("./tokenize/TokenManager");
 
@@ -24,14 +25,18 @@ const SongValidator = require("./validators/song");
 const AuthenticationValidator = require("./validators/authentication");
 const UserValidator = require("./validators/user");
 const PlaylistValidator = require("./validators/playlist");
+const ExportValidator = require("./validators/export");
+const StorageService = require("./services/StorageService");
+const LikeService = require("./services/LikeService");
 
 const init = async () => {
-    const albumService = new AlbumService();
+    const storageService = new StorageService();
+    const albumService = new AlbumService(storageService);
     const songService = new SongService();
     const userService = new UserService();
     const authenticationService = new AuthenticationService();
     const playlistService = new PlaylistService();
-
+    const likeService = new LikeService();
     const server = Hapi.server({
         port: process.env.PORT,
         host: process.env.HOST,
@@ -69,6 +74,7 @@ const init = async () => {
             plugin: albums,
             options: {
                 service: albumService,
+                likeService: likeService,
                 validator: AlbumValidator,
             },
         },
@@ -100,6 +106,14 @@ const init = async () => {
             options: {
                 service: playlistService,
                 validator: PlaylistValidator,
+            },
+        },
+        {
+            plugin: exports_plugin,
+            options: {
+                service: ProducerService,
+                playlistService: playlistService,
+                validator: ExportValidator,
             },
         },
     ]);

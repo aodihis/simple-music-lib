@@ -2,6 +2,7 @@ const { S3Client, PutObjectCommand, GetObjectCommand } = require('@aws-sdk/clien
 const {
     getSignedUrl,
 } = require('@aws-sdk/s3-request-presigner');
+const {nanoid} = require("nanoid");
 
 class StorageService {
     constructor() {
@@ -15,9 +16,10 @@ class StorageService {
     }
 
     async writeFile(file, meta) {
+        const id = nanoid(8);
         const parameter = new PutObjectCommand({
             Bucket: process.env.AWS_BUCKET_NAME,
-            Key: meta.filename,
+            Key: id + '-' + meta.filename,
             Body: file._data,
             ContentType: meta.headers['content-type'],
         });
@@ -25,7 +27,7 @@ class StorageService {
         return new Promise((resolve, reject) => {
             const url = this.createPreSignedUrl({
                 bucket: process.env.AWS_BUCKET_NAME,
-                key: meta.filename,
+                key: id + '-' + meta.filename,
             });
             this._S3.send(parameter, (error) => {
                 if (error) {

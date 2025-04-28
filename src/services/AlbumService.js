@@ -6,8 +6,9 @@ const {mapAlbumDBToModel} = require('../utils/mapper.js');
 
 class AlbumService {
 
-    constructor() {
+    constructor(storageService) {
         this._pool = new Pool();
+        this._storageService = storageService;
     }
 
     async getAlbums() {
@@ -63,6 +64,26 @@ class AlbumService {
             throw new NotFoundError('Album not found');
         }
     }
+
+    async addCoverToAlbum(id, data) {
+        await this.getById(id);
+
+        const url = await this._storageService.writeFile(data, data.hapi);
+
+        const res = await this._pool.query(
+            `UPDATE albums
+             SET cover = $1
+             WHERE id = $2 RETURNING id`,
+            [url, id]
+        );
+
+        if (!res.rows.length) {
+            throw new InvariantError('Failed to save cover');
+        }
+
+    }
+
+
 }
 
 module.exports = AlbumService;

@@ -1,9 +1,9 @@
-const ExportNotesPayloadSchema = require('./schema');
+const ExportPlaylistPayloadSchema = require('./schema');
 const InvariantError = require('../../exceptions/InvariantError');
 
-const ExportsValidator = {
-    validateExportNotesPayload: (payload) => {
-        const validationResult = ExportNotesPayloadSchema.validate(payload);
+const ExportValidator = {
+    validateExportPlaylistPayload: (payload) => {
+        const validationResult = ExportPlaylistPayloadSchema.validate(payload);
 
         if (validationResult.error) {
             throw new InvariantError(validationResult.error.message);
@@ -11,4 +11,4 @@ const ExportsValidator = {
     },
 };
 
-module.exports = ExportsValidator;
+module.exports = ExportValidator;

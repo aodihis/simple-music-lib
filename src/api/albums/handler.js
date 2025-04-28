@@ -1,7 +1,8 @@
 class albumHandler {
 
-    constructor(service, validator) {
+    constructor(service, likeService, validator) {
         this._service = service;
+        this._likeService = likeService;
         this._validator = validator;
 
         this.getAlbumsHandler = this.getAlbumsHandler.bind(this);
@@ -9,6 +10,7 @@ class albumHandler {
         this.createAlbumHandler = this.createAlbumHandler.bind(this);
         this.updateAlbumHandler = this.updateAlbumHandler.bind(this);
         this.deleteAlbumHandler = this.deleteAlbumHandler.bind(this);
+        this.uploadCoverAlbumHandler = this.uploadCoverAlbumHandler.bind(this);
     }
 
     async getAlbumsHandler(request, h) {
@@ -63,6 +65,66 @@ class albumHandler {
             message: 'Album deleted',
         })
     }
+
+    async uploadCoverAlbumHandler(request, h) {
+        const {id} = request.params;
+        const {cover} = request.payload;
+        this._validator.validateCoverHeaders(cover.hapi.headers);
+
+        await this._service.addCoverToAlbum(id,cover)
+
+        const res = h.response({
+            status: "success",
+            message: 'Album uploaded',
+        })
+        res.code(201);
+        return res;
+    }
+
+    async likeAlbumHandler(request, h) {
+        const {id: userId} = request.auth.credentials;
+        const {id: albumId} = request.params;
+
+        await this._likeService.createLike(userId, albumId);
+
+        const res = h.response({
+            status: "success",
+            message: 'Album liked',
+        })
+        res.code(201);
+        return res;
+    }
+
+    async dislikeAlbumHandler(request, h) {
+        const {id: userId} = request.auth.credentials;
+        const {id: albumId} = request.params;
+
+        await this._likeService.deleteLike(userId, albumId);
+
+        return {
+            status: "success",
+            message: 'Album disliked successfully',
+        }
+    }
+
+    async getLikesHandler(request, h) {
+        const {id: userId} = request.auth.credentials;
+        const {id: albumId} = request.params;
+
+        const {cache, likes} = await this._likeService.getLikeCount(userId, albumId);
+
+        const res =  h.response({
+            status: "success",
+            data: {likes},
+        });
+
+        if (cache) {
+            res.header("X-Data-Source", "cache");
+        }
+        return res;
+    }
+
+
 }
 
 module.exports = albumHandler;
