@@ -1,5 +1,6 @@
 const {Pool} = require("pg");
 const InvariantError = require("../exceptions/InvariantError");
+const NotFoundError = require("../exceptions/NotFoundError");
 
 const CACHE_DURATION = 1800;
 class LikeService {
@@ -17,12 +18,11 @@ class LikeService {
             this._cacheService.delete(`albums::${albumId}`);
         } catch (error) {
             if (error.code === '23505') {
-                throw InvariantError("Album already liked");
+                throw new InvariantError("Album already liked");
             }
 
-            // Handle foreign key violation (album not found)
             if (error.code === '23503') {
-                throw new InvariantError('Album not found');
+                throw new NotFoundError('Album not found');
             }
 
             throw error;
@@ -41,10 +41,10 @@ class LikeService {
 
     async getLikeCount(albumId) {
         try {
-            const likes = this._cacheService.get(`albums::${albumId}`);
+            const likes = await this._cacheService.get(`albums::${albumId}`);
             return {
                 cache: true,
-                likes: likes
+                likes: Number(likes),
             }
         } catch (_) {
         }
@@ -56,7 +56,7 @@ class LikeService {
         if (!result.rows.length) {
             throw new InvariantError('Album not found');
         }
-        const likes = result.rows[0].likes;
+        const likes = Number(result.rows[0].likes);
         this._cacheService.set(`albums::${albumId}`, likes, CACHE_DURATION);
 
         return {

@@ -52,9 +52,6 @@ const routes = (handler) => [
         method: 'GET',
         path: '/albums/{id}/likes',
         handler: handler.getLikesHandler,
-        options: {
-            auth: 'jwt',
-        },
     },
 ];
 

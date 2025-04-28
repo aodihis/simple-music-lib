@@ -28,15 +28,17 @@ const PlaylistValidator = require("./validators/playlist");
 const ExportValidator = require("./validators/export");
 const StorageService = require("./services/StorageService");
 const LikeService = require("./services/LikeService");
+const CacheService = require("./services/CacheService");
 
 const init = async () => {
     const storageService = new StorageService();
+    const cacheService = new CacheService();
     const albumService = new AlbumService(storageService);
     const songService = new SongService();
     const userService = new UserService();
     const authenticationService = new AuthenticationService();
     const playlistService = new PlaylistService();
-    const likeService = new LikeService();
+    const likeService = new LikeService(cacheService);
     const server = Hapi.server({
         port: process.env.PORT,
         host: process.env.HOST,

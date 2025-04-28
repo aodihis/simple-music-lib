@@ -11,6 +11,9 @@ class albumHandler {
         this.updateAlbumHandler = this.updateAlbumHandler.bind(this);
         this.deleteAlbumHandler = this.deleteAlbumHandler.bind(this);
         this.uploadCoverAlbumHandler = this.uploadCoverAlbumHandler.bind(this);
+        this.likeAlbumHandler = this.likeAlbumHandler.bind(this);
+        this.dislikeAlbumHandler = this.dislikeAlbumHandler.bind(this);
+        this.getLikesHandler = this.getLikesHandler.bind(this);
     }
 
     async getAlbumsHandler(request, h) {
@@ -108,10 +111,9 @@ class albumHandler {
     }
 
     async getLikesHandler(request, h) {
-        const {id: userId} = request.auth.credentials;
-        const {id: albumId} = request.params;
 
-        const {cache, likes} = await this._likeService.getLikeCount(userId, albumId);
+        const {id: albumId} = request.params;
+        const {cache, likes} = await this._likeService.getLikeCount(albumId);
 
         const res =  h.response({
             status: "success",
